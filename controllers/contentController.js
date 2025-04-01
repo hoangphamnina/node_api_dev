@@ -20,6 +20,17 @@ async function CreateContent(req, res) {
 
     console.log(langs);
 
+    let lang_txt = [];
+    for (const key in langs) {
+        if (Object.prototype.hasOwnProperty.call(langs, key)) {
+            const e = langs[key];
+            if (key == 'vi') continue;
+            lang_txt.push(`\"content${key}\": string (markdown) - Nội dung bài viết dưới dạng ${e}`);
+        }
+    }
+
+
+
     try {
         const genAI = new GoogleGenerativeAI(apikey);
         const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
@@ -41,14 +52,19 @@ async function CreateContent(req, res) {
             *Lưu ý: Không cần trả lời gì khác và chỉ hiển thị markdown theo cấu trúc json như bên dưới.
             \`\`\`json
             {
-                \"content\": string (markdown) - Nội dung bài viết,
                 \"title\": string - Seo title,
-                \"slug\": string - Slug seo title,
-                \"description\": string - Seo description
+                \"description\": string - Seo description,
+                \"content\": string (markdown) - Nội dung bài viết,
+                ${lang_txt.join(',\n')}
             }
             \`\`\`
         `;
+
+        console.log(Prompt);
+
         const result = await model.generateContent(Prompt);
+        console.log(result);
+
         res.setHeader('Content-Type', 'application/json');
         const data = {
             content: result.response.text(),
