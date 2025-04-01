@@ -56,11 +56,7 @@ async function CreateContent(req, res) {
             \`\`\`
         `;
 
-        console.log(Prompt);
-
         const result = await model.generateContent(Prompt);
-        console.log(result);
-
         res.setHeader('Content-Type', 'application/json');
         const data = {
             content: result.response.text(),
