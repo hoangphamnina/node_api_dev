@@ -18,8 +18,6 @@ async function CreateContent(req, res) {
         return;
     }
 
-    console.log(langs);
-
     let lang_txt = [];
     for (const key in langs) {
         if (Object.prototype.hasOwnProperty.call(langs, key)) {
@@ -28,8 +26,6 @@ async function CreateContent(req, res) {
             lang_txt.push(`\"content${key}\": string (markdown) - Nội dung bài viết dưới dạng ${e}`);
         }
     }
-
-
 
     try {
         const genAI = new GoogleGenerativeAI(apikey);
