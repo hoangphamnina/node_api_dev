@@ -18,6 +18,8 @@ async function CreateContent(req, res) {
         return;
     }
 
+    console.log(langs);
+
     try {
         const genAI = new GoogleGenerativeAI(apikey);
         const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
