@@ -29,7 +29,7 @@ async function CreateContent(req, res) {
 
     try {
         const genAI = new GoogleGenerativeAI(apikey);
-        const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-preview-04-17' });
         const Prompt = `
             *${note}. Bạn là một nhà sáng tao nội dung. Dựa vào dàn ý theo file JSON: \`\`\`json\n\n ${outline} \n\n\`\`\` và viết giúp tôi một bài viết SEO thõa mãn tất cả các tiêu chí sau:
             1. Phong cách viết: ${tone}
@@ -38,7 +38,7 @@ async function CreateContent(req, res) {
             4. Nội dung dài: ${length}
             5. Tiêu đề bài viết: ${title}
             6. Mật độ từ khóa mục tiêu: **1% - 1.5%**
-            7. Bỏ tiêu đề "Kết luận", "Lời kết", "Mở đầu", "Tóm lại", "Tổng kết",...
+            7. Bỏ tiêu đề và nội dụng liên quan đến "Kết luận", "Lời kết", "Mở đầu", "Tóm lại", "Tổng kết",...
             8. Chuyển đổi phần nội dung của content sang dạng json encode để chắc chắn không bị lỗi khi parse json
             9. Không sử dụng nháy đôi (double quotes) trong nội dung json
             Sau khi hoàn thành, cung cấp cho bài viết:
