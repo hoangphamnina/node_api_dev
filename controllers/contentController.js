@@ -8,6 +8,7 @@ const {
     HarmCategory,
     HarmBlockThreshold,
 } = require("@google/generative-ai");
+
 async function CreateContent(req, res) {
     const { apikey } = req.headers;
     const { length, keyword, tone, note, outline, title, langs } = req.body;
@@ -29,31 +30,67 @@ async function CreateContent(req, res) {
 
     try {
         const genAI = new GoogleGenerativeAI(apikey);
-        const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-preview-04-17' });
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+        // const Prompt = `
+        //     ${note}. Bạn là một nhà sáng tao nội dung. Dựa vào dàn ý theo file JSON: \`\`\`json\n\n ${outline} \n\n\`\`\` và viết giúp tôi một bài viết SEO thõa mãn tất cả các tiêu chí sau:
+        //     1. Phong cách viết: ${tone}
+        //     2. Từ khóa mục tiêu: **${keyword}**
+        //     3. Giữ nguyên nội dung và thứ tự các tiêu đề H2, H3 theo dàn ý
+        //     4. Nội dung dài: ${length}
+        //     5. Tiêu đề bài viết: ${title}
+        //     6. Mật độ từ khóa mục tiêu: **1% - 1.5%**
+        //     7. Bỏ tiêu đề và nội dụng liên quan đến "Kết luận", "Lời kết", "Mở đầu", "Tóm lại", "Tổng kết",...
+        //     8. Chuyển đổi phần nội dung của content sang dạng json encode để chắc chắn không bị lỗi khi parse json
+        //     9. Không sử dụng nháy đôi (double quotes) trong nội dung json
+        //     Sau khi hoàn thành, cung cấp cho bài viết:
+        //     SEO Description (160-300 ký tự)
+        //     SEO Title (40-70 ký tự)
+        //     Slug SEO Title
+        //     Lưu ý: Không cần trả lời gì khác và chỉ hiển thị markdown theo cấu trúc json như bên dưới.
+        //     \`\`\`json
+        //     {
+        //         \"title\": string - Seo title,
+        //         \"description\": string - Seo description,
+        //         \"content\": string (markdown) - Nội dung bài viết,
+        //         ${lang_txt.join(',\n')}
+        //     }
+        //     \`\`\`
+        // `;
+
         const Prompt = `
-            *${note}. Bạn là một nhà sáng tao nội dung. Dựa vào dàn ý theo file JSON: \`\`\`json\n\n ${outline} \n\n\`\`\` và viết giúp tôi một bài viết SEO thõa mãn tất cả các tiêu chí sau:
-            1. Phong cách viết: ${tone}
-            2. Từ khóa mục tiêu: **${keyword}**
-            3. Giữ nguyên nội dung và thứ tự các tiêu đề H2, H3 theo dàn ý
-            4. Nội dung dài: ${length}
-            5. Tiêu đề bài viết: ${title}
-            6. Mật độ từ khóa mục tiêu: **1% - 1.5%**
-            7. Bỏ tiêu đề và nội dụng liên quan đến "Kết luận", "Lời kết", "Mở đầu", "Tóm lại", "Tổng kết",...
-            8. Chuyển đổi phần nội dung của content sang dạng json encode để chắc chắn không bị lỗi khi parse json
-            9. Không sử dụng nháy đôi (double quotes) trong nội dung json
-            Sau khi hoàn thành, cung cấp cho bài viết:
-            * SEO Description (160-300 ký tự)
-            * SEO Title (40-70 ký tự)
-            * Slug SEO Title
-            *Lưu ý: Không cần trả lời gì khác và chỉ hiển thị markdown theo cấu trúc json như bên dưới.
-            \`\`\`json
-            {
-                \"title\": string - Seo title,
-                \"description\": string - Seo description,
-                \"content\": string (markdown) - Nội dung bài viết,
-                ${lang_txt.join(',\n')}
-            }
-            \`\`\`
+        *${note}*  
+        Bạn là một nhà sáng tạo nội dung chuyên nghiệp. Dựa vào **dàn ý có sẵn** dưới dạng JSON như bên dưới:
+
+        \`\`\`json
+        ${outline}
+        \`\`\`
+
+        Hãy viết một **bài viết SEO hoàn chỉnh** theo tất cả các yêu cầu sau:
+
+        1. **Phong cách viết**: ${tone}
+        2. **Từ khóa mục tiêu chính**: ${keyword}
+        3. **Giữ nguyên hoàn toàn** nội dung và **thứ tự** các tiêu đề H2, H3 theo dàn ý
+        4. **Độ dài nội dung yêu cầu**: khoảng ${length} từ
+        5. **Tiêu đề bài viết**: ${title}
+        6. **Mật độ từ khóa**: dao động từ 1% đến 1.5%
+        7. **Không được sử dụng** các tiêu đề hoặc nội dung có liên quan đến: “Kết luận”, “Lời kết”, “Tóm lại”, “Mở đầu”, “Tổng kết”, v.v.
+        8. **Không viết thêm bất kỳ đoạn nào nằm ngoài dàn ý**
+        9. Nội dung bài viết phải được encode dưới dạng **JSON hợp lệ**, để đảm bảo không bị lỗi khi parse
+        10. **Không được sử dụng dấu nháy đôi** ("") trong nội dung chuỗi JSON — chỉ dùng nháy đơn ('') nếu cần
+
+        ---
+
+        **Sau khi hoàn tất bài viết, hãy cung cấp đầu ra ở đúng định dạng JSON như sau (không được kèm theo bất kỳ lời giải thích nào):**
+
+        \`\`\`json
+        {
+        "title": string,            // SEO Title (40-70 ký tự)
+        "description": string,      // SEO Description (160-300 ký tự)
+        "slug": string,             // Slug SEO Title (dùng để tạo URL)
+        "content": string,          // Nội dung bài viết ở dạng markdown (theo dàn ý)
+        ${lang_txt.join(',\n')}
+        }
+        \`\`\`
         `;
 
         const result = await model.generateContent(Prompt);
@@ -98,30 +135,67 @@ async function CreateOutline(req, res) {
 
     try {
         const genAI = new GoogleGenerativeAI(apikey);
-        const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-preview-04-17', tools: [{ 'google_search': {} }] });
-        const Prompt = `Bạn là một nhà sáng tạo nội dung. Hãy tạo cho tôi dàn ý để viết một bài viết SEO thỏa các tiêu chí bên dưới:
-            1. Phong cách viết: ${tone}
-            2. Tối đa 4 lần xuất hiện H2
-            3. Không viết về các quy trình hoặc cách đặt hàng
-            4. Không so sánh với các đối thủ khác
-            5. Bỏ tiêu đề "Kết luận", "Lời kết", "Mở đầu", "Tóm lại", "Tổng kết",...
-            6. Độ dài bài viết: ${length}
-            7. Từ khóa mục tiêu: ${keyword}
-            8. Tiêu đề bài viết: ${title}
-            9. Chuyển đổi phần nội dung của content sang dạng json encode để chắc chắn không bị lỗi khi parse json
-            10. Không sử dụng nháy đôi (double quotes) trong nội dung json
-            *Lưu ý: Không cần trả lời gì khác và chỉ hiển thị markdown theo cấu trúc json như bên dưới.
-            \`\`\`json
-            [
-                {
-                    "name": "<Tiêu đề H2>",
-                    "subHeadings": [
-                        "name": "<Tiêu đề H3>",
-                    ],
-                }
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash', tools: [{ 'google_search': {} }] });
+        // const Prompt = `Bạn là một nhà sáng tạo nội dung. Hãy tạo cho tôi dàn ý để viết một bài viết SEO thỏa các tiêu chí bên dưới:
+        //     1. Phong cách viết: ${tone}
+        //     2. Tối đa 4 lần xuất hiện H2
+        //     3. Không viết về các quy trình hoặc cách đặt hàng
+        //     4. Không so sánh với các đối thủ khác
+        //     5. Bỏ tiêu đề "Kết luận", "Lời kết", "Mở đầu", "Tóm lại", "Tổng kết",...
+        //     6. Độ dài bài viết: ${length}
+        //     7. Từ khóa mục tiêu: ${keyword}
+        //     8. Tiêu đề bài viết: ${title}
+        //     9. Chuyển đổi phần nội dung của content sang dạng json encode để chắc chắn không bị lỗi khi parse json
+        //     10. Không sử dụng nháy đôi (double quotes) trong nội dung json
+        //     Lưu ý: Không cần trả lời gì khác và chỉ hiển thị markdown theo cấu trúc json như bên dưới.
+        //     \`\`\`json
+        //     [
+        //         {
+        //             "name": "<Tiêu đề H2>",
+        //             "subHeadings": [
+        //                 "name": "<Tiêu đề H3>",
+        //             ],
+        //         }
+        //     ]
+        //     \`\`\`
+        // `;
+
+        const Prompt = `
+        Bạn là một chuyên gia sáng tạo nội dung. Hãy giúp tôi tạo **dàn ý chi tiết** cho một bài viết SEO, đáp ứng chính xác các yêu cầu sau:
+
+        1. **Phong cách viết**: ${tone}
+        2. **Độ dài dự kiến của bài viết**: khoảng ${length} từ. Dàn ý phải phù hợp với độ dài này — không quá sơ sài và không quá dài.
+        3. **Số lượng tiêu đề H2 tối đa là 4**, mỗi H2 có thể có từ 1 đến 3 H3 bên trong.
+        4. Tuyệt đối **không đưa nội dung về quy trình, cách đặt hàng**, hoặc các bước thực hiện.
+        5. Không so sánh với bất kỳ đối thủ hay sản phẩm dịch vụ tương tự nào.
+        6. Loại bỏ hoàn toàn các tiêu đề như: "Kết luận", "Lời kết", "Mở đầu", "Tóm lại", "Tổng kết",...
+        7. **Từ khóa mục tiêu**: ${keyword}
+        8. **Tiêu đề chính của bài viết**: ${title}
+        9. Kết quả trả về phải ở dạng **JSON encode chuẩn**, không được để lỗi khi parse.
+        10. **Không được sử dụng dấu nháy đôi (double quotes)** trong nội dung chuỗi JSON.
+        11. **Chỉ trả về JSON đúng theo cấu trúc bên dưới, không viết thêm bất kỳ nội dung nào khác.**
+
+        \`\`\`json
+        [
+        {
+            "name": "<Tiêu đề H2>",
+            "subHeadings": [
+            { "name": "<Tiêu đề H3>" },
+            { "name": "<Tiêu đề H3>" }
             ]
-            \`\`\`
+        },
+        {
+            "name": "<Tiêu đề H2>",
+            "subHeadings": [
+            { "name": "<Tiêu đề H3>" }
+            ]
+        }
+        ]
+        \`\`\`
+
+        Lưu ý: Dàn ý phải được xây dựng để triển khai bài viết có độ dài khoảng ${length} từ một cách hợp lý và trọn vẹn.
         `;
+
         const result = await model.generateContent(Prompt);
         res.setHeader('Content-Type', 'application/json');
         const data = {
