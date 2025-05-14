@@ -30,7 +30,7 @@ async function CreateContent(req, res) {
 
     try {
         const genAI = new GoogleGenerativeAI(apikey);
-        const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-preview-04-17' });
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
         // const Prompt = `
         //     ${note}. Bạn là một nhà sáng tao nội dung. Dựa vào dàn ý theo file JSON: \`\`\`json\n\n ${outline} \n\n\`\`\` và viết giúp tôi một bài viết SEO thõa mãn tất cả các tiêu chí sau:
         //     1. Phong cách viết: ${tone}
@@ -137,7 +137,7 @@ async function CreateOutline(req, res) {
 
     try {
         const genAI = new GoogleGenerativeAI(apikey);
-        const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-preview-04-17', tools: [{ 'google_search': {} }] });
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash', tools: [{ 'google_search': {} }] });
         // const Prompt = `Bạn là một nhà sáng tạo nội dung. Hãy tạo cho tôi dàn ý để viết một bài viết SEO thỏa các tiêu chí bên dưới:
         //     1. Phong cách viết: ${tone}
         //     2. Tối đa 4 lần xuất hiện H2
