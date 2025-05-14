@@ -98,7 +98,7 @@ async function CreateOutline(req, res) {
 
     try {
         const genAI = new GoogleGenerativeAI(apikey);
-        const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash', tools: [{ 'google_search': {} }] });
+        const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash-preview-04-17', tools: [{ 'google_search': {} }] });
         const Prompt = `Bạn là một nhà sáng tạo nội dung. Hãy tạo cho tôi dàn ý để viết một bài viết SEO thỏa các tiêu chí bên dưới:
             1. Phong cách viết: ${tone}
             2. Tối đa 4 lần xuất hiện H2
