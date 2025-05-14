@@ -60,13 +60,13 @@ async function CreateContent(req, res) {
         const Prompt = `
         *${note}*  
         Bạn là một nhà sáng tạo nội dung chuyên nghiệp. Dựa vào **dàn ý có sẵn** dưới dạng JSON như bên dưới:
-
+        
         \`\`\`json
         ${outline}
         \`\`\`
-
+        
         Hãy viết một **bài viết SEO hoàn chỉnh** theo tất cả các yêu cầu sau:
-
+        
         1. **Phong cách viết**: ${tone}
         2. **Từ khóa mục tiêu chính**: ${keyword}
         3. **Giữ nguyên hoàn toàn** nội dung và **thứ tự** các tiêu đề H2, H3 theo dàn ý
@@ -75,23 +75,25 @@ async function CreateContent(req, res) {
         6. **Mật độ từ khóa**: dao động từ 1% đến 1.5%
         7. **Không được sử dụng** các tiêu đề hoặc nội dung có liên quan đến: “Kết luận”, “Lời kết”, “Tóm lại”, “Mở đầu”, “Tổng kết”, v.v.
         8. **Không viết thêm bất kỳ đoạn nào nằm ngoài dàn ý**
-        9. Nội dung bài viết phải được encode dưới dạng **JSON hợp lệ**, để đảm bảo không bị lỗi khi parse
-        10. **Không được sử dụng dấu nháy đôi** ("") trong nội dung chuỗi JSON — chỉ dùng nháy đơn ('') nếu cần
-
+        9. Nội dung bài viết cần được **biến tấu linh hoạt, sinh động**, tránh đơn điệu. Hãy sử dụng **danh sách (bullet point hoặc numbered list)**, **bảng (table)** và **xuống dòng** khi thấy phù hợp để giúp bài viết trở nên rõ ràng, dễ đọc và sinh động hơn. Đặc biệt chú ý đến việc chia nhỏ các ý tưởng lớn và trình bày chúng theo các nhóm có cấu trúc dễ hiểu.
+        10. Nội dung bài viết phải được encode dưới dạng **JSON hợp lệ**, để đảm bảo không bị lỗi khi parse
+        11. **Không được sử dụng dấu nháy đôi** ("") trong nội dung chuỗi JSON — chỉ dùng nháy đơn ('') nếu cần
+        
         ---
-
+        
         **Sau khi hoàn tất bài viết, hãy cung cấp đầu ra ở đúng định dạng JSON như sau (không được kèm theo bất kỳ lời giải thích nào):**
-
+        
         \`\`\`json
         {
-        "title": string,            // SEO Title (40-70 ký tự)
-        "description": string,      // SEO Description (160-300 ký tự)
-        "slug": string,             // Slug SEO Title (dùng để tạo URL)
-        "content": string,          // Nội dung bài viết ở dạng markdown (theo dàn ý)
-        ${lang_txt.join(',\n')}
+          "title": string,            // SEO Title (40-70 ký tự)
+          "description": string,      // SEO Description (160-300 ký tự)
+          "slug": string,             // Slug SEO Title (dùng để tạo URL)
+          "content": string,          // Nội dung bài viết ở dạng markdown (theo dàn ý, có thể bao gồm list và bảng nếu cần)
+          ${lang_txt.join(',\n')}
         }
         \`\`\`
         `;
+
 
         const result = await model.generateContent(Prompt);
         res.setHeader('Content-Type', 'application/json');
