@@ -70,7 +70,7 @@ async function CreateContent(req, res) {
         1. **Phong cách viết**: ${tone}
         2. **Từ khóa mục tiêu chính**: ${keyword}
         3. **Giữ nguyên hoàn toàn** nội dung và **thứ tự** các tiêu đề H2, H3 theo dàn ý
-        4. **Độ dài nội dung yêu cầu**: khoảng ${length} từ
+        4. **Độ dài bài viết**: Bài viết cần phải có **đúng độ dài** khoảng **${length} từ**. Vui lòng không viết quá dài hoặc quá ngắn so với yêu cầu.
         5. **Tiêu đề bài viết**: ${title}
         6. **Mật độ từ khóa**: dao động từ 1% đến 1.5%
         7. **Không được sử dụng** các tiêu đề hoặc nội dung có liên quan đến: “Kết luận”, “Lời kết”, “Tóm lại”, “Mở đầu”, “Tổng kết”, v.v.
