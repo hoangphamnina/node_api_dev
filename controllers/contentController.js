@@ -28,7 +28,6 @@ async function CreateContent(req, res) {
 
   try {
     const genAI = new GoogleGenAI({ apiKey: apikey });
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
     const Prompt = `
         *${note}*  
         Bạn là một nhà sáng tạo nội dung chuyên nghiệp. Dựa vào **dàn ý có sẵn** dưới dạng JSON như bên dưới:
@@ -66,13 +65,17 @@ async function CreateContent(req, res) {
         \`\`\`
         `;
 
-    const result = await model.generateContent(Prompt);
+    const result = await genAI.models.generateContent({
+      model: "gemini-2.0-flash",
+      contents: Prompt,
+    });
+
     res.setHeader("Content-Type", "application/json");
     const data = {
-      content: result.response.text(),
-      promptTokenCount: result.response.usageMetadata.promptTokenCount,
-      candidatesTokenCount: result.response.usageMetadata.candidatesTokenCount,
-      totalTokenCount: result.response.usageMetadata.totalTokenCount,
+      content: result.text,
+      promptTokenCount: result.usageMetadata.promptTokenCount,
+      candidatesTokenCount: result.usageMetadata.candidatesTokenCount,
+      totalTokenCount: result.usageMetadata.totalTokenCount,
     };
     res.write(JSON.stringify(data));
     res.end();
@@ -92,11 +95,7 @@ async function CreateOutline(req, res) {
   }
 
   try {
-    const genAI = new GoogleGenAI(apikey);
-    const model = genAI.getGenerativeModel({
-      model: "gemini-2.0-flash",
-      tools: [{ google_search: {} }],
-    });
+    const genAI = new GoogleGenAI({ apiKey: apikey });
     const Prompt = `
         Bạn là một chuyên gia sáng tạo nội dung. Hãy giúp tôi tạo **dàn ý chi tiết** cho một bài viết SEO, đáp ứng chính xác các yêu cầu sau:
 
@@ -133,13 +132,20 @@ async function CreateOutline(req, res) {
         Lưu ý: Dàn ý phải được xây dựng để triển khai bài viết có độ dài khoảng ${length} từ một cách hợp lý và trọn vẹn.
         `;
 
-    const result = await model.generateContent(Prompt);
+    const result = await genAI.models.generateContent({
+      model: "gemini-2.0-flash",
+      contents: Prompt,
+      config: {
+        tools: [{ googleSearch: {} }],
+      },
+    });
+
     res.setHeader("Content-Type", "application/json");
     const data = {
-      content: result.response.text(),
-      promptTokenCount: result.response.usageMetadata.promptTokenCount,
-      candidatesTokenCount: result.response.usageMetadata.candidatesTokenCount,
-      totalTokenCount: result.response.usageMetadata.totalTokenCount,
+      content: result.text,
+      promptTokenCount: result.usageMetadata.promptTokenCount,
+      candidatesTokenCount: result.usageMetadata.candidatesTokenCount,
+      totalTokenCount: result.usageMetadata.totalTokenCount,
     };
     res.write(JSON.stringify(data));
 
